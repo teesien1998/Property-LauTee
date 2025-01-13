@@ -1,0 +1,34 @@
+import PropertyCard from "@/components/PropertyCard";
+import connectDB from "@/config/database";
+import User from "@/models/User";
+import { getSessionUser } from "@/utils/getSessionUser";
+
+const SavedPropertiesPage = async () => {
+  const { userId } = await getSessionUser();
+
+  await connectDB();
+  const { bookmarks } = await User.findById(userId)
+    .populate("bookmarks")
+    .lean();
+
+  return (
+    <section className="px-4 py-6">
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 from-5% to-blue-500 to-15% bg-clip-text text-transparent mb-4">
+          Saved Properties
+        </h1>
+        {bookmarks.length === 0 ? (
+          <p>No saved properties</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {bookmarks.map((property) => (
+              <PropertyCard key={property._id} property={property} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+export default SavedPropertiesPage;
